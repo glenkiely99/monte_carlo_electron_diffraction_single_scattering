@@ -100,7 +100,6 @@ def initialise_postions(E = E0, d = 2e-9): #d is diameter of electron probe in m
     cx = x0/vector_length
     cy = y0/vector_length
     cz = z0/vector_length
-    
     print("cx = " + str(cx))
     print("cy = " + str(cy))
     print("cz = " + str(cz))
@@ -152,7 +151,7 @@ def coord_step(coords, cosines, step, E, alpha):
     #######################
     ca = (cx*cos_phi) + (V1*V3) + (cy*V2*V4) 
     cb = (cy*cos_phi) + (V4*( (cz*V1) - (cx*V2) )) 
-    cc = (cz*cos_phi) + (V2*V3) + (cy*V1*V4) 
+    cc = (cz*cos_phi) + (V2*V3) - (cy*V1*V4) 
     #######################
     print("ca = " + str(ca))
     print("cb = " + str(cb))
