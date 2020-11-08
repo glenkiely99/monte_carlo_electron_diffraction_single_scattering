@@ -14,6 +14,10 @@ import random
 import math
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from decimal import *
+
+
+error = []
 
 #necessary constants
 avo = 6.022e23 #avogadros number
@@ -22,7 +26,7 @@ avo = 6.022e23 #avogadros number
 #initialise the code
 E0 = 100 #starting energy of electron in keV
 E = E0
-Z = 6 #atomic number of sample magnesium
+Z = 6 #atomic number of sample carbon
 A = 12.011 #g/mol
 rho = 2.26 #density of target g/cm3
 no_of_steps = 5 #number of steps
@@ -126,6 +130,9 @@ def coord_step(coords, cosines, step, E, alpha):
     cx = cosines[0]
     cy = cosines[1]
     cz = cosines[2]
+    print("cx = " + str(cx))
+    print("cy = " + str(cy))
+    print("cz = " + str(cz))
     #######################
     cos_phi, sin_phi, azi_scat_angle = scattering_angles(alpha)
     #######################
@@ -136,6 +143,7 @@ def coord_step(coords, cosines, step, E, alpha):
     if cz == 0:
         cz = 0.000001
     AN = - (cx/cz) 
+    AN2 = AN**2
     AM = 1 / (math.sqrt(1 + (AN*AN)))
     V1 = AN * sin_phi 
     V2 = AN * AM * sin_phi 
@@ -148,15 +156,27 @@ def coord_step(coords, cosines, step, E, alpha):
     print("V4 = " + str(V4))
     print("AM = " + str(AM))
     print("AN = " + str(AN))
+    print("AN2 = " + str(AN2))
     #######################
     ca = (cx*cos_phi) + (V1*V3) + (cy*V2*V4) 
     cb = (cy*cos_phi) + (V4*( (cz*V1) - (cx*V2) )) 
     cc = (cz*cos_phi) + (V2*V3) - (cy*V1*V4) 
+    addto = 1 - (ca**2 + cb**2 + cc**2)
+    print("addto = " + str(addto))
+    #if addto < 0:
+        #addto = abs(addto)
+        #addto = math.sqrt(addto)
+        #ca = ca - (addto/2)
+        #cb = cb - (addto/2)
+    #else: 
+        #addto = math.sqrt(addto)
+        #ca += (addto/2)
+        #cb += (addto/2)
     #######################
     print("ca = " + str(ca))
     print("cb = " + str(cb))
     print("cc = " + str(cc))
-    print("adds up to 1? = " + str(ca**2 + cb**2 + cc**2)) #this should equal 1, why not???
+    print("adds up to 1? = " + str((ca**2) + (cb**2) + (cc**2))) #this should equal 1, why not???
     #######################
     xn = x + (step*ca)
     yn = y + (step*cb)
@@ -165,6 +185,8 @@ def coord_step(coords, cosines, step, E, alpha):
     coords = (xn, yn, zn)
     coordinate_history.append(coords)
     cosines = (ca, cb, cc)
+    err = 1 - (ca**2 + cb**2 + cc**2)
+    error.append(err)
     return coords, cosines
 
 
@@ -224,6 +246,18 @@ print("stopped = " + str(number_stopped))
 print("backscattered = " + str(number_backscattered))
 plt.show()
 
+def errorplot(error): #plots the increase in compounding error from 1-cosines**2 - constantly increases except for a few spikes
+    x_vals = []
+    delta = []
+    for i in range(len(error)):
+        x_vals.append(i)
+        E2 = error[i]
+        E1 = error[i-1]
+        delta.append(E2 - E1)
+    
+    plt.plot(x_vals, delta)
+    plt.show()
+    
 #for i in range(len(coordinate_history) - 1):
 #    print(coordinate_history[i]) 
 
